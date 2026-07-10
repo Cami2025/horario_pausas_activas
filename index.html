@@ -19,7 +19,11 @@
     body{
       margin:0;
       font-family:Inter,Segoe UI,Arial,sans-serif;
-      background:linear-gradient(180deg,#ffffff 0%,var(--fondo) 100%);
+      background:
+        radial-gradient(circle at top left, rgba(13,84,216,.12), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(8,163,75,.12), transparent 30%),
+        linear-gradient(180deg,#f9fbff 0%,#eef4fb 100%);
+      background-attachment:fixed;
       color:var(--texto);
     }
 
