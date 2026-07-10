@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -295,6 +297,50 @@
       letter-spacing:.4px;
     }
 
+
+    .vista-escritorio{display:block}
+    .vista-movil{display:none}
+
+    .bloque-horario{
+      background:white;
+      border:1px solid var(--borde);
+      border-radius:16px;
+      padding:16px;
+      box-shadow:0 8px 22px rgba(20,50,110,.08);
+    }
+
+    .bloque-horario h3{
+      margin:0 0 12px;
+      color:var(--azul);
+      font-size:18px;
+    }
+
+    .grupo-movil{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      padding:12px 0;
+      border-top:1px solid #e7edf6;
+    }
+
+    .grupo-movil:first-of-type{
+      border-top:0;
+      padding-top:0;
+    }
+
+    .grupo-movil span{
+      color:#607197;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.45px;
+    }
+
+    .grupo-movil strong{
+      color:#102253;
+      font-size:16px;
+      line-height:1.3;
+    }
+
     footer{
       text-align:center;
       margin-top:18px;
@@ -320,8 +366,94 @@
       }
     }
 
-    @media(max-width:560px){
-      .reservas-grid{grid-template-columns:1fr}
+    @media(max-width:768px){
+      .pagina{
+        width:94%;
+        padding-top:14px;
+      }
+
+      header{
+        gap:14px;
+        margin-bottom:16px;
+      }
+
+      .titulo h1{
+        font-size:30px;
+        letter-spacing:-1px;
+      }
+
+      .titulo p{
+        font-size:16px;
+      }
+
+      .estado{
+        width:100%;
+        min-width:0;
+      }
+
+      .selector-semana{
+        grid-template-columns:1fr 1fr;
+        margin-bottom:18px;
+      }
+
+      .semana-btn{
+        padding:14px 8px;
+        font-size:16px;
+      }
+
+      .semana-btn span{
+        font-size:13px;
+      }
+
+      .barra-superior{
+        padding:16px;
+      }
+
+      .barra-superior h2{
+        width:100%;
+        font-size:19px;
+      }
+
+      .dias{
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        width:100%;
+      }
+
+      .dia-btn{
+        width:100%;
+        padding:11px 8px;
+        font-size:13px;
+      }
+
+      .vista-escritorio{display:none}
+      .vista-movil{
+        display:grid;
+        gap:14px;
+        padding:16px;
+      }
+
+      .reservas-grid{
+        grid-template-columns:1fr;
+      }
+
+      .reservas-encabezado{
+        align-items:flex-start;
+      }
+    }
+
+    @media(max-width:420px){
+      .selector-semana{
+        grid-template-columns:1fr;
+      }
+
+      .dias{
+        grid-template-columns:1fr 1fr;
+      }
+
+      .logo img{
+        width:160px;
+      }
     }
 
     @media print{
@@ -365,7 +497,7 @@
         <div class="dias" id="dias"></div>
       </div>
 
-      <div class="tabla-scroll">
+      <div class="tabla-scroll vista-escritorio">
         <table>
           <thead>
             <tr>
@@ -382,6 +514,9 @@
           <tbody id="cuerpoTabla"></tbody>
         </table>
       </div>
+
+      <div class="vista-movil" id="horarioMovil"></div>
+
     </section>
 
     <section class="reservas">
@@ -529,6 +664,8 @@
     const tituloReservas = document.getElementById("tituloReservas");
     const textoReservas = document.getElementById("textoReservas");
     const reservasGrid = document.getElementById("reservasGrid");
+    const horarioMovil = document.getElementById("horarioMovil");
+    const edificios = ["A","B","C","D","G","H","I"];
 
     function renderDias(){
       const dias = Object.keys(horarios[semanaActual].dias);
@@ -543,6 +680,7 @@
           diaActual = dia;
           renderDias();
           renderTabla();
+          renderMovil();
         });
         diasContenedor.appendChild(btn);
       });
@@ -575,6 +713,47 @@
       });
     }
 
+
+    function renderMovil(){
+      horarioMovil.innerHTML = "";
+
+      horarios[semanaActual].dias[diaActual].forEach(fila => {
+        const hora = fila[0];
+        const grupos = fila.slice(1)
+          .map((grupo, index) => ({
+            grupo,
+            edificio: edificios[index]
+          }))
+          .filter(item => item.grupo);
+
+        if(grupos.length === 0) return;
+
+        const tarjeta = document.createElement("article");
+        tarjeta.className = "bloque-horario";
+
+        const tituloHora = document.createElement("h3");
+        tituloHora.textContent = hora;
+        tarjeta.appendChild(tituloHora);
+
+        grupos.forEach(item => {
+          const grupo = document.createElement("div");
+          grupo.className = "grupo-movil";
+
+          const edificio = document.createElement("span");
+          edificio.textContent = `EDIFICIO ${item.edificio}`;
+
+          const nombre = document.createElement("strong");
+          nombre.textContent = item.grupo;
+
+          grupo.appendChild(edificio);
+          grupo.appendChild(nombre);
+          tarjeta.appendChild(grupo);
+        });
+
+        horarioMovil.appendChild(tarjeta);
+      });
+    }
+
     function renderTabla(){
       cuerpoTabla.innerHTML = "";
       horarios[semanaActual].dias[diaActual].forEach(fila => {
@@ -601,12 +780,14 @@
         diaActual = Object.keys(horarios[semanaActual].dias)[0];
         renderDias();
         renderTabla();
+        renderMovil();
         renderReservas();
       });
     });
 
     renderDias();
     renderTabla();
+    renderMovil();
     renderReservas();
   </script>
 </body>
