@@ -1,0 +1,444 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Programa de Pausas Activas</title>
+  <style>
+    :root{
+      --azul:#0b2a74;
+      --azul2:#0d54d8;
+      --verde:#07883c;
+      --fondo:#f5f8fd;
+      --borde:#dce6f4;
+      --texto:#102253;
+      --sombra:0 14px 35px rgba(20,50,110,.10);
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,Segoe UI,Arial,sans-serif;
+      background:linear-gradient(180deg,#ffffff 0%,var(--fondo) 100%);
+      color:var(--texto);
+    }
+
+    .pagina{
+      width:min(1600px,96%);
+      margin:auto;
+      padding:24px 0 36px;
+    }
+
+    header{
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      gap:24px;
+      align-items:center;
+      margin-bottom:22px;
+    }
+
+    .logo{
+      font-size:33px;
+      font-weight:800;
+      color:var(--azul2);
+      white-space:nowrap;
+    }
+
+    .logo span{color:#f28c00;font-weight:500}
+
+    .titulo h1{
+      margin:0;
+      font-size:clamp(28px,3vw,58px);
+      line-height:1;
+      color:var(--azul);
+      letter-spacing:-1.8px;
+    }
+
+    .titulo p{
+      margin:10px 0 0;
+      font-size:clamp(16px,1.5vw,27px);
+      color:#38517e;
+    }
+
+    .estado{
+      background:white;
+      border:1px solid var(--borde);
+      border-radius:16px;
+      padding:14px 20px;
+      box-shadow:var(--sombra);
+      text-align:center;
+      min-width:230px;
+    }
+
+    .estado small{display:block;color:#607197;margin-bottom:4px}
+    .estado strong{font-size:24px;color:var(--verde)}
+    .estado span{display:block;margin-top:3px}
+
+    .selector-semana{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      width:min(850px,100%);
+      margin:0 auto 24px;
+      border-radius:15px;
+      overflow:hidden;
+      box-shadow:var(--sombra);
+      background:white;
+      border:1px solid var(--borde);
+    }
+
+    .semana-btn{
+      border:0;
+      background:white;
+      color:var(--azul2);
+      padding:17px 20px;
+      font-weight:800;
+      font-size:20px;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    .semana-btn span{
+      display:block;
+      font-size:16px;
+      font-weight:600;
+      margin-top:4px;
+    }
+    .semana-btn.activa{
+      background:linear-gradient(135deg,#0b7a35,#08a34b);
+      color:white;
+    }
+
+    .panel{
+      background:white;
+      border:1px solid var(--borde);
+      border-radius:18px;
+      box-shadow:var(--sombra);
+      overflow:hidden;
+    }
+
+    .barra-superior{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      padding:18px 20px;
+      border-bottom:1px solid var(--borde);
+      flex-wrap:wrap;
+    }
+
+    .barra-superior h2{
+      margin:0;
+      font-size:22px;
+      color:var(--azul);
+    }
+
+    .dias{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .dia-btn{
+      border:1px solid #cbd9ee;
+      background:#f7faff;
+      color:var(--azul);
+      padding:10px 17px;
+      border-radius:10px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .dia-btn.activo{
+      background:var(--azul2);
+      color:white;
+      border-color:var(--azul2);
+    }
+
+    .tabla-scroll{overflow-x:auto}
+
+    table{
+      width:100%;
+      min-width:1050px;
+      border-collapse:collapse;
+      table-layout:fixed;
+    }
+
+    th,td{
+      border:1px solid #e1e8f3;
+      padding:13px 8px;
+      text-align:center;
+      vertical-align:middle;
+      height:66px;
+    }
+
+    th{
+      color:white;
+      font-size:15px;
+      letter-spacing:.1px;
+    }
+
+    .hora{background:#071f58;width:130px}
+    .a{background:#e0040b}
+    .b{background:#0754d5}
+    .c{background:#552090}
+    .d{background:#ffbf00;color:#1d2d55}
+    .g{background:#ff6d00}
+    .h{background:#0b8a3d}
+    .i{background:#7d7f83}
+
+    td{
+      color:#0e2b74;
+      font-size:14px;
+      font-weight:700;
+      background:#fff;
+    }
+
+    td:first-child{
+      color:#17294f;
+      font-size:15px;
+      background:#fbfcff;
+      white-space:nowrap;
+    }
+
+    .vacio{
+      color:#9aa8bf;
+      font-weight:500;
+    }
+
+    footer{
+      text-align:center;
+      margin-top:18px;
+      color:#607197;
+      font-size:14px;
+    }
+
+    @media(max-width:900px){
+      header{
+        grid-template-columns:1fr;
+        text-align:center;
+      }
+      .estado{justify-self:center}
+      .barra-superior{align-items:flex-start}
+      .selector-semana{grid-template-columns:1fr}
+      .logo{font-size:28px}
+    }
+
+    @media print{
+      body{background:white}
+      .pagina{width:100%;padding:0}
+      .dias,.selector-semana{display:none}
+      .panel{box-shadow:none}
+      header{grid-template-columns:auto 1fr auto}
+    }
+  </style>
+</head>
+<body>
+  <main class="pagina">
+    <header>
+      <div class="logo">Vive<span>Bienestar</span></div>
+      <div class="titulo">
+        <h1>PROGRAMA DE PAUSAS ACTIVAS</h1>
+        <p>Organización de Pausas Activas por Día y Edificio</p>
+      </div>
+      <div class="estado">
+        <small>Esta semana corresponde a:</small>
+        <strong id="estadoSemana">SEMANA B</strong>
+        <span id="estadoFecha">20 al 24 de julio</span>
+      </div>
+    </header>
+
+    <section class="selector-semana">
+      <button class="semana-btn" data-semana="A">
+        SEMANA A
+        <span>14 al 17 de julio</span>
+      </button>
+      <button class="semana-btn activa" data-semana="B">
+        SEMANA B
+        <span>20 al 24 de julio</span>
+      </button>
+    </section>
+
+    <section class="panel">
+      <div class="barra-superior">
+        <h2 id="tituloTabla">Calendario Semana B · 20 al 24 de julio</h2>
+        <div class="dias" id="dias"></div>
+      </div>
+
+      <div class="tabla-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th class="hora">HORA</th>
+              <th class="a">EDIFICIO A</th>
+              <th class="b">EDIFICIO B</th>
+              <th class="c">EDIFICIO C</th>
+              <th class="d">EDIFICIO D</th>
+              <th class="g">EDIFICIO G</th>
+              <th class="h">EDIFICIO H</th>
+              <th class="i">EDIFICIO I</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpoTabla"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer>Programa de Pausas Activas · Vive Bienestar</footer>
+  </main>
+
+  <script>
+    const horarios = {
+      A: {
+        rango: "14 al 17 de julio",
+        dias: {
+          "Martes": [
+            ["09:00 - 10:00","","","","","","",""],
+            ["10:00 - 11:00","Unidad de Registros Clínicos","","","","","",""],
+            ["11:00 - 12:00","","","","Contact Center","Neonatología","",""],
+            ["12:00 - 12:30","","","","","","",""],
+            ["14:00 - 15:00","Laboratorio de Cardiología","","Logística","Cuidados Paliativos","","",""],
+            ["15:00 - 16:00","","","Experiencia Paciente","","","",""],
+            ["16:00 - 16:30","","","","","Pediatría","",""]
+          ],
+          "Miércoles": [
+            ["09:00 - 10:00","","","Facturación","","","Control Financiero",""],
+            ["10:00 - 11:00","","","GES CAEC","","","Bodega Central",""],
+            ["11:00 - 12:00","","","","","","",""],
+            ["12:00 - 12:30","","","","","","",""],
+            ["14:00 - 15:00","Laboratorio de Cardiología","","","Anatomía Patológica","","Estación de Enfermería",""],
+            ["15:00 - 16:00","Laboratorio Gastroenterología","","","","","",""],
+            ["16:00 - 16:30","","","","Hemodinamia","","",""]
+          ],
+          "Jueves": [
+            ["09:00 - 10:00","","","Ley de Urgencia","","","Service Line",""],
+            ["10:00 - 11:00","","Infraestructura","","","","Investigación y Docencia",""],
+            ["11:00 - 12:00","","","","Consignaciones","","IAAS",""],
+            ["12:00 - 12:30","","","","","","",""],
+            ["14:00 - 15:00","Laboratorio de Cardiología","","","","Ropería","","Centro del Cáncer Ambulatorio"],
+            ["15:00 - 16:00","","","","","","",""],
+            ["16:00 - 16:30","","","Central de Cajas","","","Tesorería",""]
+          ],
+          "Viernes": [
+            ["09:00 - 10:00","","","","","Pabellón Maternidad","",""],
+            ["10:00 - 11:00","","","","","","",""],
+            ["11:00 - 12:00","","","Cierre de Cuentas","Bodega Pabellón Central","","Comercial",""],
+            ["12:00 - 12:30","","Equipos Médicos","","","","",""],
+            ["14:00 - 15:00","","","","","","",""],
+            ["15:00 - 16:00","","","","","","",""],
+            ["16:00 - 16:30","","","","","Pediatría","",""]
+          ]
+        }
+      },
+      B: {
+        rango: "20 al 24 de julio",
+        dias: {
+          "Lunes": [
+            ["09:00 - 10:00","","","Servicio al Cliente","","","Vacunatorio",""],
+            ["10:00 - 11:00","","","","","","",""],
+            ["11:00 - 12:00","","","","Contact Center","Anatomía Patológica","",""],
+            ["12:00 - 12:30","","","","","","",""],
+            ["14:00 - 15:00","Laboratorio Cardiología","","","","","",""],
+            ["15:00 - 16:00","","","Experiencia Paciente","Cuidados Paliativos","","",""],
+            ["16:00 - 16:30","","","","Hemodinamia","","",""]
+          ],
+          "Martes": [
+            ["09:00 - 10:00","","","Servicio al Cliente","","","",""],
+            ["10:00 - 11:00","","","","","","",""],
+            ["11:00 - 12:00","","","Cuentas Médicas","Anatomía Patológica","","",""],
+            ["12:00 - 12:30","","","","","","",""],
+            ["14:00 - 15:00","Laboratorio Cardiología","","","","","",""],
+            ["15:00 - 16:00","Laboratorio Gastroenterología","","","","","","Centro del Cáncer Ambulatorio"],
+            ["16:00 - 16:30","","","Cobranza Judicial","","","",""]
+          ],
+          "Miércoles": [
+            ["09:00 - 10:00","","","Ley de Urgencia","","","",""],
+            ["10:00 - 11:00","","","","","","",""],
+            ["11:00 - 12:00","","Infraestructura","","","","",""],
+            ["12:00 - 12:30","","","","Consignaciones","Ropería","Estación de Enfermería",""],
+            ["14:00 - 15:00","Laboratorio Cardiología","","","","","",""],
+            ["15:00 - 16:00","Laboratorio Gastroenterología","","","","","",""],
+            ["16:00 - 16:30","","","","UPC Pediátrica","","",""]
+          ],
+          "Jueves": [
+            ["09:00 - 10:00","","","Abastecimiento","","","Service Line",""],
+            ["10:00 - 11:00","","","","","","Investigación y Docencia",""],
+            ["11:00 - 12:00","","","","","","IAAS",""],
+            ["12:00 - 12:30","","","","","","",""],
+            ["14:00 - 15:00","","","","","","",""],
+            ["15:00 - 16:00","Laboratorio Respiratorio","","Biblioteca","","Tesorería","",""],
+            ["16:00 - 16:30","","","","","","",""]
+          ],
+          "Viernes": [
+            ["09:00 - 10:00","","","","","Neonatología","",""],
+            ["10:00 - 11:00","","","","","","",""],
+            ["11:00 - 12:00","","","Cierre de Cuentas","Bodega Pabellón Central","","Comercial",""],
+            ["12:00 - 12:30","","","Equipos Médicos","","","",""],
+            ["14:00 - 15:00","","","","","","",""],
+            ["15:00 - 16:00","","","","","","",""],
+            ["16:00 - 16:30","","","","","Pediatría","",""]
+          ]
+        }
+      }
+    };
+
+    let semanaActual = "B";
+    let diaActual = "Lunes";
+
+    const botonesSemana = document.querySelectorAll(".semana-btn");
+    const diasContenedor = document.getElementById("dias");
+    const cuerpoTabla = document.getElementById("cuerpoTabla");
+    const tituloTabla = document.getElementById("tituloTabla");
+    const estadoSemana = document.getElementById("estadoSemana");
+    const estadoFecha = document.getElementById("estadoFecha");
+
+    function renderDias(){
+      const dias = Object.keys(horarios[semanaActual].dias);
+      if(!dias.includes(diaActual)) diaActual = dias[0];
+
+      diasContenedor.innerHTML = "";
+      dias.forEach(dia => {
+        const btn = document.createElement("button");
+        btn.className = "dia-btn" + (dia === diaActual ? " activo" : "");
+        btn.textContent = dia.toUpperCase();
+        btn.addEventListener("click", () => {
+          diaActual = dia;
+          renderDias();
+          renderTabla();
+        });
+        diasContenedor.appendChild(btn);
+      });
+    }
+
+    function renderTabla(){
+      cuerpoTabla.innerHTML = "";
+      horarios[semanaActual].dias[diaActual].forEach(fila => {
+        const tr = document.createElement("tr");
+        fila.forEach((valor, index) => {
+          const td = document.createElement("td");
+          td.textContent = valor || "–";
+          if(!valor && index !== 0) td.classList.add("vacio");
+          tr.appendChild(td);
+        });
+        cuerpoTabla.appendChild(tr);
+      });
+
+      const rango = horarios[semanaActual].rango;
+      tituloTabla.textContent = `Calendario Semana ${semanaActual} · ${rango} · ${diaActual}`;
+      estadoSemana.textContent = `SEMANA ${semanaActual}`;
+      estadoFecha.textContent = rango;
+    }
+
+    botonesSemana.forEach(btn => {
+      btn.addEventListener("click", () => {
+        semanaActual = btn.dataset.semana;
+        botonesSemana.forEach(b => b.classList.toggle("activa", b === btn));
+        diaActual = Object.keys(horarios[semanaActual].dias)[0];
+        renderDias();
+        renderTabla();
+      });
+    });
+
+    renderDias();
+    renderTabla();
+  </script>
+</body>
+</html>
